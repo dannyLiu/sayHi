@@ -1,0 +1,50 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#contentDiv {
+  width: 800px;
+  height: 500px;
+  position: relative;
+}
+
+#usersDiv {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100px;
+  height: 450px;
+  border-style: groove;
+}
+
+#messagesDiv {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 650px;
+  height: 450px;
+  border-style: groove;
+}
+
+#controllerDiv {
+  position: absolute;
+  bottom: 0px;
+  right: 20px;
+  margin-top: 10px;
+  width: 630px
+}
+
+.aMessage {
+  background-color: #EBB3A7;
+  padding-left: 20px;
+}
+
+.aMessage_self {
+  background-color: #4CE067;
+  padding-right: 20px;
+}

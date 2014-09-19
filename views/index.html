@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Billowsoft - SayHi</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="/stylesheets/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="header">
+    <h1>Hi, <%= username%></h1>
+    <input type="hidden" id='username' value="<%= username%>"></input>
+</div>
+<div id="contentDiv">
+    <div id="messagesDiv">
+        <table id='messagesTable' height="380px">
+            <tr height="30px">
+                <td width="100px" align="left"></td>
+                <td width="400px" align="left"></td>
+                <td width="100px" align="left"></td>
+            </tr>
+        </table>
+    </div>
+    <div id="usersDiv">
+        <ul id="users"></ul>
+    </div>
+    <div id="controllerDiv">
+        <form id='messageForm'>
+            <input type="text" id="message" size="50px"/>
+            <button>Send</button>
+        </form>
+    </div>
+</div>
+<div id="footer"></div>
+
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="/javascripts/socket.io/socket.io.js"></script>
+<script>
+    var username = $('#username').val();
+    function addMessage(isSelf, message, username) {
+        var currentTime = new Date();
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        var time = hours + ':' + minutes;
+        $('#messagesTable tr:last').after(
+                        '<tr height="10px"><td align="center" colspan=3>' + time
+                        + '</td></tr>');
+        if (isSelf) {
+            $('#messagesTable tr:last').after(
+                            '<tr height="30px"><td width="400px" align="right" class="aMessage_self">'
+                            + message
+                            + '</td><td width="100px" align="left">'
+                            + username + '</td></tr>');
+        } else {
+            $('#messagesTable tr:last')
+                    .after(
+                            '<tr height="30px"><td width="100px" align="right">'
+                            + username
+                            + '</td><td width="400px" align="left" class="aMessage">'
+                            + message + '</td></tr>');
+        }
+    }
+    ;
+
+    function refreshUserList(data) {
+        $('#users').text('');
+        for (key in data.users) {
+            $('#users').append($('<li>').text(data.users[key]));
+        }
+    }
+
+    var socket = io('http://localhost');
+
+    socket.on('connect', function () {
+        socket.emit('login', {
+            'username': username
+        });
+    });
+
+    socket.on('userLogin', function (data) {
+        refreshUserList(data);
+    });
+    socket.on('userLogout', function (data) {
+        refreshUserList(data);
+    });
+
+    $('#messageForm').submit(function () {
+        var message = $('#message').val();
+        socket.emit('message', {
+            'message': message,
+            'username': username
+        });
+        $('#message').val('');
+        addMessage(true, message, username);
+        return false;
+    });
+
+    socket.on('message', function (data) {
+        if (username != data.username) {
+            addMessage(false, data.message, data.username);
+        }
+    });
+
+</script>
+</body>
+</html>
